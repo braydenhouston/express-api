@@ -43,7 +43,7 @@ app.get('/', (request, response) => {
 
 app.get('/api/goats', async (request, response) => {
   const result = goats
-  response.json(result) 
+  response.json(result)
 })
 
 app.get('/api/goats/:id', (request, response) => {
@@ -56,6 +56,7 @@ app.get('/api/goats/:id', (request, response) => {
   response.json(result) 
 })
 
+const emptyValues = ["", undefined, null, NaN]
 const update = async (request, response) => {
   const index = goats.findIndex(({ id }) => id === request.params.id)
   let result = goats[index]
@@ -68,8 +69,9 @@ const update = async (request, response) => {
     result = {
       id: result.id,
       name: dirtyGoat.name || result.name,
-      powerLevel: dirtyGoat.powerLevel || result.powerLevel,
-      isGrumpy: dirtyGoat.isGrumpy || result.isGrumpy,
+      powerLevel: emptyValues.includes(dirtyGoat.powerLevel) ? result.powerLevel : dirtyGoat.powerLevel,
+      isGrumpy: emptyValues.includes(dirtyGoat.isGrumpy) ? result.isGrumpy : !!dirtyGoat.isGrumpy,
+      avatar: dirtyGoat.avatar || result.avatar
     }
     goats[index] = result
     await db.write()
@@ -102,6 +104,7 @@ app.post('/api/goats', async (request, response) => {
     name: dirtyGoat.name || null,
     powerLevel: dirtyGoat.powerLevel || null,
     isGrumpy: dirtyGoat.isGrumpy || false,
+    avatar: dirtyGoat.avatar || null
   }
 
   goats.push(cleanGoat)
