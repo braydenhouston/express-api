@@ -2,7 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import express from 'express'
 import crypto from 'crypto'
-import { Low, JSONFile } from 'lowdb'
+import { Low } from 'lowdb'
+import { JSONFile } from 'lowdb/node'
 
 const app = express()
 const port = process.env.PORT || 8081
@@ -14,9 +15,7 @@ if (!fs.existsSync(dataDir)){
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const db = new Low(new JSONFile(dataPath))
-await db.read()
-db.data ||= {
+const db = new Low(new JSONFile(dataPath), {
   goats: [
     {
       id: 'f00000000000000d',
@@ -25,7 +24,8 @@ db.data ||= {
       isGrumpy: true
     }
   ]
-}
+})
+await db.read()
 const { goats } = db.data
 
 const generateId = () => {
